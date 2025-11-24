@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+:root{
+  --accent-from: #f97316; /* orange */
+  --accent-to: #ffffff;   /* white */
+  --glass-bg: rgba(255,255,255,0.6);
+  --glass-border: rgba(255,255,255,0.6);
+  --card-shadow: 0 6px 18px rgba(15,23,42,0.06);
+}
+html,body{height:100%}
+body {
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg, rgba(247,148,29,0.06) 0%, rgba(255,255,255,0.02) 100%);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  color:#0f172a;
+}
+
+/* Glass header */
+.glass {
+  background: linear-gradient(90deg, rgba(255,255,255,0.75), rgba(255,255,255,0.55));
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.6);
+}
+
+/* Modal */
+.modal-backdrop {
+  background: rgba(2,6,23,0.6);
+  backdrop-filter: blur(4px);
+}
+
+/* small utility for gradient accent */
+.accent-btn {
+  background: linear-gradient(90deg, var(--accent-from), #ff7a3a);
+}
+
+/* card */
+.glass-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.75));
+  box-shadow: var(--card-shadow);
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.03);
+}
+
+/* file preview image */
+.preview-img { object-fit: cover; width:100%; height:100%; border-radius:9999px; }
+
+/* make small icon buttons consistent */
+.icon-btn { width:38px; height:38px; display:inline-flex; align-items:center; justify-content:center; border-radius:10px; }
+
+/* custom scrollbar for big content */
+.content-area::-webkit-scrollbar { width: 10px; }
+.content-area::-webkit-scrollbar-thumb { background: rgba(15,23,42,0.08); border-radius: 8px; }
+.content-area::-webkit-scrollbar-track { background: transparent; }
