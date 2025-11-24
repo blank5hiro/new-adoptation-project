@@ -3,684 +3,914 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>God's Home of Refuge - Every Pet Deserves a Loving Home</title>
+    <title>Admin Dashboard Prototype</title>
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- We'll use a single <style> block for custom, non-Tailwind styling and variables -->
-    <link rel="stylesheet" href="style.css">
-	
-	<script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        'primary-brown': '#8F5B3A',
-                        'light-orange': '#D29A5B',
-                    }
-                }
-            }
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
         }
-    </script>
-	
+
+        /* Custom scrollbar for better look */
+        .content-area::-webkit-scrollbar {
+            width: 8px;
+        }
+        .content-area::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1; /* slate-300 */
+            border-radius: 4px;
+        }
+        .content-area::-webkit-scrollbar-track {
+            background-color: #f1f5f9; /* slate-100 */
+        }
+        
+        /* Utility styles for specific component colors */
+        .metric-card-amber { border-left-color: #f59e0b; }
+        .metric-card-sky { border-left-color: #0ea5e9; }
+        .metric-card-orange { border-left-color: #f97316; }
+        .metric-card-green { border-left-color: #10b981; }
+    </style>
+    <!-- Load Lucide Icons for visual appeal -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="min-h-screen">
+<body class="flex flex-col min-h-screen bg-gray-50/f4f7f9">
 
-    <!-- Firebase Setup Script (Mandatory for real-world apps) -->
-    <script src="firebase.js"></script>
-
-    <!-- Main JavaScript File -->
-    <script src="script.js"></script>
-
-    <!-- 1. Header/Navigation Bar (Always visible) -->
-    <header class="navbar flex justify-between items-center px-6 py-3 shadow-md bg-white sticky top-0 z-10">
-        <div class="logo font-extrabold text-xl" style="color: var(--secondary-color);">🐾 God's <span style="color: var(--primary-color);"> Home of Refuge </span></div>
-        <nav class="flex items-center space-x-6">
-		 <ul class="flex space-x-6">
-            <a href="#" class="nav-link" data-target="home-page" onclick="navigate('home-page')">Home</a>
-            <a href="#" class="nav-link" data-target="about-page" onclick="navigate('about-page')">About</a>
-            <a href="#" class="nav-link" data-target="find-pets-page" onclick="navigate('find-pets-page'); applyFilters();">Find Pets</a>
-            <a href="#" class="nav-link" data-target="adopt-page" onclick="navigate('adopt-page')">Adopt</a>
-            <a href="#" class="nav-link" data-target="health-page" onclick="navigate('health-page')">Health Records</a>
-            <!-- UPDATED: Navigate to the new contact-page section -->
-            <a href="#" class="nav-link" data-target="contact-page" onclick="navigate('contact-page')">Contact</a>
-			
-        </nav>
-        <div class="fixed top-4 right-4 z-10">
-        <div class="auth-buttons space-x-2">
-            <button id="open-auth-btn" class="text-sm font-medium text-white px-4 py-2 rounded-full shadow-md transition hover:bg-opacity-90" style="background-color: var(--primary-color); margin-top: 7px;">Login/SignUp</button>
+    <!-- Header Navigation Bar -->
+    <header class="sticky top-0 z-20 h-16 bg-white shadow-md">
+        <div class="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+            <!-- Logo/Title -->
+            <div class="flex items-center text-xl font-extrabold text-gray-800">
+                <i data-lucide="shield-check" class="mr-2 h-6 w-6 text-amber-500"></i>
+                Admin Dashboard
+            </div>
+            
+            <!-- Navigation Links -->
+            <nav class="flex space-x-4 md:space-x-8">
+                <button onclick="showSection('dashboard')" class="nav-item active text-amber-600 border-amber-500">
+                    Dashboard
+                </button>
+                <button onclick="showSection('pet-management')" class="nav-item">
+                    Pet Management
+                </button>
+                <button onclick="showSection('adoption-management')" class="nav-item">
+                    Adoptions
+                </button>
+                <button onclick="showSection('health-records')" class="nav-item">
+                    Health Records
+                </button>
+                <button onclick="showSection('user-management')" class="nav-item">
+                    Users
+                </button>
+            </nav>
+            
+            <div class="w-4"></div> <!-- Placeholder -->
         </div>
-    </div>
     </header>
-	  <!-- --- LOGIN/SIGNUP --- -->
-	<div id="modal-container" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center min-h-screen p-0 sm:p-4 z-20 items-end sm:items-center">
 
-        <div id="auth-card" class="bg-white w-full sm:max-w-md rounded-t-xl sm:rounded-xl shadow-2xl p-6 sm:p-8 transform transition-all duration-500 ease-in-out max-h-[95vh] overflow-y-auto">
+    <!-- Main Content Area -->
+    <main class="content-area container mx-auto flex-1 overflow-y-auto p-4 md:p-8">
 
-            <div class="flex mb-6 border-b border-gray-200 -mt-2 -mx-4 sm:-mx-6">
-                <button id="login-tab" onclick="showView('login')" class="tab-button active-tab">
-                    Login
-                </button>
-                <button id="signup-tab" onclick="showView('signup')" class="tab-button">
-                    Sign Up
-                </button>
+        <!-- Dynamic Content Sections -->
+        <section id="dashboard" class="content-section space-y-8">
+            <h1 class="border-b-2 border-gray-200 pb-2 text-3xl font-extrabold text-gray-900">System Dashboard</h1>
+            
+            <!-- Key Metrics -->
+            <div id="metric-cards" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <!-- Metrics will be inserted here by JS -->
             </div>
-
-            <div id="login-view">
-                <header class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-semibold text-gray-700">Enter your credentials</h3>
-                    <button onclick="closeModal()" aria-label="Close" class="text-gray-400 hover:text-gray-600 transition duration-150">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </header>
-
-                <form onsubmit="handleFormSubmit(event, 'Login')">
-                    <div class="space-y-4">
-                        <div>
-                            <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                            <input type="email" id="login-email" placeholder="Enter your email" required class="auth-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
-                        </div>
-
-                        <div>
-                            <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                            <div class="relative">
-                                <input type="password" id="login-password" placeholder="Enter your password" required class="auth-input w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
-                                <button type="button" onclick="togglePasswordVisibility('login-password')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary-brown focus:outline-none" aria-label="Toggle password visibility">
-                                    <svg id="login-password-toggle-show" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                    <svg id="login-password-toggle-hide" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.82L10.5 15.445 7.125 18.82A.75.75 0 016 18.25V6.75a.75.75 0 011.125-.662l3.375 3.374 3.375-3.374A.75.75 0 0115 6.75v11.5a.75.75 0 01-1.125.562z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between pt-2">
-                            <div class="flex items-center">
-                                <input id="remember-me" type="checkbox" class="h-4 w-4 text-primary-brown rounded border-gray-300 focus:ring-light-orange">
-                                <label for="remember-me" class="ml-2 block text-sm text-gray-900">Remember me</label>
-                            </div>
-                            <a href="#" onclick="showMessage('Password reset link simulated.')" class="text-sm font-medium text-primary-brown hover:text-light-orange transition duration-150">Forgot password?</a>
-                        </div>
-
-                        <button type="submit" class="auth-button-gradient text-white font-semibold w-full py-3 rounded-lg mt-6">Login</button>
-                    </div>
-                </form>
+            
+            <!-- Alerts Section -->
+            <div class="card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="mb-4 flex items-center text-2xl font-semibold text-gray-800">
+                    <i data-lucide="bell" class="mr-3 h-6 w-6 text-red-500"></i> Critical Alerts
+                </h2>
+                <ul id="alert-list" class="mt-3 space-y-3">
+                    <!-- Alerts will be inserted here by JS -->
+                </ul>
             </div>
+        </section>
 
-            <div id="signup-view" class="hidden">
-                <header class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-semibold text-gray-700">Tell us about yourself</h3>
-                    <button onclick="closeModal()" aria-label="Close" class="text-gray-400 hover:text-gray-600 transition duration-150">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </header>
-
-                <form onsubmit="handleFormSubmit(event, 'Create Account')">
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label for="signup-first-name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                                <input type="text" id="signup-first-name" placeholder="First name" required class="auth-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
-                            </div>
-                            <div>
-                                <label for="signup-last-name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                                <input type="text" id="signup-last-name" placeholder="Last name" required class="auth-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label for="signup-birthday" class="block text-sm font-medium text-gray-700 mb-1">Birthday</label>
-                                <input type="date" id="signup-birthday" required class="auth-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
-                            </div>
-                            <div>
-                                <label for="signup-mobile" class="block text-sm font-medium text-gray-700 mb-1">Mobile</label>
-                                <input type="tel" id="signup-mobile" placeholder="e.g., 09123456789" required class="auth-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="signup-address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                            <input type="text" id="signup-address" placeholder="Enter your full address" required class="auth-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
-                        </div>
-
-                        <div>
-                            <label for="signup-email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                            <input type="email" id="signup-email" placeholder="Enter your email" required class="auth-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
-                        </div>
-
-                        <div>
-                            <label for="signup-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                            <div class="relative">
-                                <input type="password" id="signup-password" placeholder="Create a password" required class="auth-input w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
-                                <button type="button" onclick="togglePasswordVisibility('signup-password')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary-brown focus:outline-none" aria-label="Toggle password visibility">
-                                    <svg id="signup-password-toggle-show" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                    <svg id="signup-password-toggle-hide" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.82L10.5 15.445 7.125 18.82A.75.75 0 016 18.25V6.75a.75.75 0 011.125-.662l3.375 3.374 3.375-3.374A.75.75 0 0115 6.75v11.5a.75.75 0 01-1.125.562z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="signup-confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                            <div class="relative">
-                                <input type="password" id="signup-confirm-password" placeholder="Confirm your password" required class="auth-input w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
-                                <button type="button" onclick="togglePasswordVisibility('signup-confirm-password')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary-brown focus:outline-none" aria-label="Toggle password visibility">
-                                    <svg id="signup-confirm-password-toggle-show" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                    <svg id="signup-confirm-password-toggle-hide" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.82L10.5 15.445 7.125 18.82A.75.75 0 016 18.25V6.75a.75.75 0 011.125-.662l3.375 3.374 3.375-3.374A.75.75 0 0115 6.75v11.5a.75.75 0 01-1.125.562z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start pt-2">
-                            <input id="terms-agree" type="checkbox" required class="mt-1 h-4 w-4 text-primary-brown rounded border-gray-300 focus:ring-light-orange">
-                            <label for="terms-agree" class="ml-3 block text-sm text-gray-900 leading-snug">
-                                I agree to the
-                                <a href="#" onclick="showMessage('Terms of Service clicked.')" class="font-medium text-primary-brown hover:text-light-orange">Terms of Service</a>
-                                and
-                                <a href="#" onclick="showMessage('Privacy Policy clicked.')" class="font-medium text-primary-brown hover:text-light-orange">Privacy Policy</a>
-                            </label>
-                        </div>
-
-                        <button type="submit" class="auth-button-gradient text-white font-semibold w-full py-3 rounded-lg mt-6">Create Account</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div> <div id="message-box" class="fixed top-4 left-1/2 transform -translate-x-1/2 p-4 rounded-lg shadow-xl text-white bg-gray-800 transition-opacity duration-300 opacity-0 pointer-events-none z-50"></div>
-    <!-- --- MAIN CONTENT SECTIONS --- -->
-
-    <!-- ============================================== -->
-    <!-- HOME PAGE -->
-    <!-- ============================================== -->
-    <section id="home-page" data-page class="min-h-screen">
-        <!-- 2. Hero Section -->
-        <div class="hero-section">
-            <div class="hero-content">
-                <h1 class="text-4xl lg:text-5xl font-extrabold leading-tight mb-4 drop-shadow-lg">Every Pet Deserves a <strong>Loving Home</strong></h1>
-                <p class="text-lg mb-6 drop-shadow-md">Change your life with the perfect pet companion. Our intelligent matching system connects you with pets that fit your lifestyle, ensuring a long-lasting and loving relationship.</p>
-
-                <div class="search-match">
-                    <h3 class="font-semibold text-lg mb-3">Find Your Perfect Match</h3>
-                    <!-- ADDED IDs AND VALUE ATTRIBUTES FOR HERO FILTERS -->
-                    <div class="search-form flex gap-3 mb-4">
-                        <select id="hero-filter-type" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 flex-grow" style="color: var(--secondary-color);">
-                            <option value="All Types">Pet Type</option>
+        <section id="pet-management" class="content-section hidden space-y-8">
+            <h1 class="border-b-2 border-gray-200 pb-2 text-3xl font-extrabold text-gray-900">Pet Management</h1>
+            
+            <!-- Add New Pet Form -->
+            <div class="card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="mb-4 text-xl font-semibold text-amber-700">Add New Pet</h2>
+                <form id="add-pet-form" class="flex flex-col space-y-4">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+                        <input type="text" id="pet-name" placeholder="Pet Name (e.g., Sparky)" required class="input-field p-3 border border-gray-300 rounded-lg outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition duration-150">
+                        <select id="pet-species" required class="input-field p-3 border border-gray-300 rounded-lg outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition duration-150">
+                            <option value="">Select Species</option>
                             <option value="Dog">Dog</option>
                             <option value="Cat">Cat</option>
                             <option value="Other">Other</option>
                         </select>
-                        <select id="hero-filter-age" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 flex-grow" style="color: var(--secondary-color);">
-                            <option value="All Ages">Age Range</option>
-                            <option value="Puppy/Kitten">Puppy/Kitten (0-1)</option>
-                            <option value="Adult">Adult (1-7)</option>
-                            <option value="Senior">Senior (7+)</option>
-                        </select>
-                        <!-- UPDATED: Added onclick to applyHeroFilters() -->
-                        <button class="search-btn text-white px-5 rounded-lg font-semibold shadow-md transition hover:bg-amber-600" style="background-color: var(--primary-color);" onclick="applyHeroFilters()">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
-                            Find Pets
+                        <input type="number" id="pet-age" placeholder="Age (years)" required min="0" class="input-field p-3 border border-gray-300 rounded-lg outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition duration-150">
+                        
+                        <!-- NEW FILE INPUT COLUMN -->
+                        <div>
+                            <label for="pet-photo-upload" class="block text-sm font-medium text-gray-700 mb-1">Photo (Max 500KB)</label>
+                            <div class="flex items-center space-x-3">
+                                <input type="file" id="pet-photo-upload" accept="image/*" onchange="handlePetPhotoChange(event)" class="input-field w-full p-2 border border-gray-300 rounded-lg outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition duration-150 text-sm">
+                                <div id="photo-preview-container" class="h-10 w-10 overflow-hidden rounded-full bg-gray-100 flex items-center justify-center border-2 border-amber-500 flex-shrink-0 hidden">
+                                    <img id="pet-photo-preview" class="h-full w-full object-cover" alt="Pet Preview">
+                                    <i data-lucide="image" class="w-6 h-6 text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary w-full bg-amber-600 hover:bg-amber-700 text-white p-3 rounded-lg font-bold shadow-md transition duration-150">
+                        <i data-lucide="plus" class="mr-2 inline h-5 w-5"></i> Register Pet
+                    </button>
+                </form>
+            </div>
+
+            <!-- Pet List -->
+            <div class="card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="mb-4 text-xl font-semibold text-gray-800">Current Pet Inventory</h2>
+                <div id="pet-list" class="flex flex-col space-y-4">
+                    <!-- Pet cards will be inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <section id="adoption-management" class="content-section hidden space-y-8">
+            <h1 class="border-b-2 border-gray-200 pb-2 text-3xl font-extrabold text-gray-900">Adoption Application Management</h1>
+            <div class="card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="mb-4 text-xl font-semibold text-gray-800">Pending & Reviewed Applications</h2>
+                <div id="adoption-requests" class="flex flex-col space-y-4">
+                    <!-- Adoption requests will be inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Health Records Section -->
+        <section id="health-records" class="content-section hidden space-y-8">
+            <h1 class="border-b-2 border-gray-200 pb-2 text-3xl font-extrabold text-gray-900">Health Record Management</h1>
+            
+            <!-- Pet Selector / Search -->
+            <div class="card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="mb-4 text-xl font-semibold text-amber-700">Find Pet Health History</h2>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <select id="health-pet-select" class="input-field p-3 border border-gray-300 rounded-lg outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition duration-150 flex-1">
+                        <!-- Options filled by renderHealthRecords -->
+                    </select>
+                    <button id="view-records-btn" onclick="viewPetHealthRecords()" class="btn-primary bg-sky-600 hover:bg-sky-700 text-white p-3 rounded-lg font-bold shadow-md transition duration-150 w-full sm:w-auto" disabled>
+                        <i data-lucide="eye" class="mr-2 inline h-5 w-5"></i> View Records
+                    </button>
+                </div>
+            </div>
+
+            <!-- Health Records Display Area -->
+            <div class="card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="mb-4 text-xl font-semibold text-gray-800">Selected Pet Records</h2>
+                <div id="health-records-display">
+                    <p class="text-gray-600 italic">Please select a pet from the list above to view their medical history or log a new record.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="user-management" class="content-section hidden space-y-8">
+            <h1 class="border-b-2 border-gray-200 pb-2 text-3xl font-extrabold text-gray-900">User Account Management</h1>
+            <div class="card bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="mb-4 text-xl font-semibold text-gray-800">Registered Users</h2>
+                <div id="user-list" class="flex flex-col space-y-4">
+                    <!-- User cards will be inserted here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Custom Modal/Message Box (Replaces alert()) -->
+    <div id="message-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-gray-900 bg-opacity-75" onclick="document.getElementById('message-modal').classList.add('hidden')">
+        <div id="modal-content" class="modal-content bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm" onclick="event.stopPropagation()">
+            <h3 id="modal-title" class="text-xl font-bold mb-2 text-gray-900"></h3>
+            <p id="modal-body" class="text-gray-700 mb-4"></p>
+            <button onclick="document.getElementById('message-modal').classList.add('hidden')" class="btn-primary bg-amber-600 hover:bg-amber-700 text-white p-3 rounded-lg font-bold shadow-md transition duration-150 w-auto">Close</button>
+        </div>
+    </div>
+
+
+    <script>
+        // --- MOCK DATA STORE (Simulating Firestore/API Backend) ---
+        let MOCK_PETS = [
+            // ADDED 'photo: null' to the mock data structure
+            { id: 1, name: "Sparky", species: "Dog", age: 3, status: "Available", photo: null },
+            { id: 2, name: "Whiskers", species: "Cat", age: 5, status: "Adopted", photo: null },
+            { id: 3, name: "Bunny", species: "Rabbit", age: 1, status: "Available", photo: null },
+        ];
+        
+        let MOCK_USERS = [
+            { id: 'user_a', name: "Jane Doe", role: "Applicant", status: "Active" },
+            { id: 'user_b', name: "John Smith", role: "Admin", status: "Active" },
+            { id: 'user_c', name: "Sara Connor", role: "Applicant", status: "Deactivated" },
+        ];
+
+        let MOCK_ADOPTIONS = [
+            { id: 101, petId: 1, petName: "Sparky", userId: 'user_a', userName: "Jane Doe", status: "Pending", answers: "Has large fenced yard, 2 previous dogs." },
+            { id: 102, petId: 3, petName: "Bunny", userId: 'user_c', userName: "Sara Connor", status: "Pending", answers: "Lives in apartment, no prior pets." },
+            { id: 103, petId: 2, petName: "Whiskers", userId: 'user_b', userName: "John Smith", status: "Approved", answers: "Existing approved adopter." },
+        ];
+
+        let nextPetId = MOCK_PETS.length + 1;
+        let nextAdoptionId = MOCK_ADOPTIONS.length + 101;
+
+
+        // --- CORE UI FUNCTIONS ---
+
+        // Global state for temporary image preview before submission
+        let currentPetImage = null;
+        const MAX_SIZE_BYTES = 500 * 1024; // 500 KB
+
+        /**
+         * Converts a File object to a Base64 Data URI string.
+         * @param {File} file 
+         * @returns {Promise<string>} Base64 Data URI
+         */
+        function fileToDataUri(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (event) => resolve(event.target.result);
+                reader.onerror = (error) => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        /**
+         * Handler for the pet photo file input change.
+         */
+        async function handlePetPhotoChange(event) {
+            const file = event.target.files[0];
+            const previewImg = document.getElementById('pet-photo-preview');
+            const previewContainer = document.getElementById('photo-preview-container');
+
+            if (file) {
+                if (file.size > MAX_SIZE_BYTES) {
+                    displayMessage(
+                        "File Too Large",
+                        "Image file is too large. Please select a file under 500KB.",
+                        "text-red-600"
+                    );
+                    event.target.value = null; // Clear file input
+                    currentPetImage = null;
+                    previewContainer.classList.add('hidden');
+                    return;
+                }
+
+                try {
+                    const dataUri = await fileToDataUri(file);
+                    currentPetImage = dataUri;
+                    previewImg.src = dataUri;
+                    previewContainer.classList.remove('hidden');
+                } catch (e) {
+                    console.error("Error reading file:", e);
+                    displayMessage("Error", "Error reading file. Please try again.", "text-red-600");
+                    currentPetImage = null;
+                    previewContainer.classList.add('hidden');
+                    event.target.value = null;
+                }
+            } else {
+                currentPetImage = null;
+                previewContainer.classList.add('hidden');
+                previewImg.src = '';
+            }
+        }
+
+
+        /**
+         * Displays a custom modal message. Accepts HTML for the body.
+         */
+        function displayMessage(title, bodyHtml, colorClass = 'text-gray-900') { 
+            const modal = document.getElementById('message-modal');
+            const titleEl = document.getElementById('modal-title');
+            const bodyEl = document.getElementById('modal-body');
+
+            titleEl.textContent = title;
+            titleEl.className = `text-xl font-bold mb-2 ${colorClass}`; 
+            bodyEl.innerHTML = bodyHtml; 
+            
+            modal.classList.remove('hidden');
+            
+            // Re-bind the close function to the specific close button within the modal content
+            document.getElementById('modal-content').querySelector('button').onclick = () => modal.classList.add('hidden');
+            // Re-bind the backdrop click handler
+            modal.onclick = () => modal.classList.add('hidden');
+            document.getElementById('modal-content').onclick = (e) => e.stopPropagation();
+        }
+
+        /**
+         * Switches the active content section and updates the top navigation link style.
+         * @param {string} sectionId - The ID of the section to show.
+         */
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            // Show the target section
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            // Update active state in top navigation
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.remove('active', 'text-amber-600', 'border-amber-500', 'border-b-2');
+                btn.classList.add('text-gray-600', 'hover:text-amber-600', 'p-2', 'text-sm', 'font-medium', 'rounded-lg', 'border-b-2', 'border-transparent');
+            });
+            const activeBtn = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active', 'text-amber-600', 'border-amber-500');
+                activeBtn.classList.remove('text-gray-600', 'hover:text-amber-600', 'border-transparent');
+            }
+            
+            // Re-render content specific to the new section
+            if (sectionId === 'dashboard') renderDashboard();
+            if (sectionId === 'pet-management') renderPetList();
+            if (sectionId === 'adoption-management') renderAdoptionRequests();
+            if (sectionId === 'health-records') renderHealthRecords(); // New call
+            if (sectionId === 'user-management') renderUserList();
+        }
+
+        /**
+         * Renders the Dashboard section with metrics and alerts.
+         */
+        function renderDashboard() {
+            const totalPets = MOCK_PETS.length;
+            const availablePets = MOCK_PETS.filter(p => p.status === 'Available').length;
+            const totalUsers = MOCK_USERS.length;
+            const pendingRequests = MOCK_ADOPTIONS.filter(a => a.status === 'Pending').length;
+
+            const approvedRecent = MOCK_ADOPTIONS.filter(a => a.status === 'Approved').slice(-2);
+            const rejectedRecent = MOCK_ADOPTIONS.filter(a => a.status === 'Rejected').slice(-2);
+
+            const metrics = [
+                { title: "Total Pets", value: totalPets, icon: "paw-print", color: "amber" },
+                { title: "Total Users", value: totalUsers, icon: "users", color: "sky" },
+                { title: "Pending Applications", value: pendingRequests, icon: "files", color: "orange" },
+                { title: "Available for Adoption", value: availablePets, icon: "heart", color: "green" },
+            ];
+
+            const metricCards = document.getElementById('metric-cards');
+            metricCards.innerHTML = metrics.map(m => `
+                <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 metric-card-${m.color} transition duration-300 hover:shadow-xl">
+                    <div class="flex items-center justify-between">
+                        <div class="text-gray-500 font-medium">${m.title}</div>
+                        <i data-lucide="${m.icon}" class="w-6 h-6 text-${m.color}-500"></i>
+                    </div>
+                    <div class="text-3xl font-extrabold text-gray-900 mt-2">${m.value}</div>
+                </div>
+            `).join('');
+            
+            lucide.createIcons(); // Re-render icons after content update
+
+            // Render Alerts
+            const alertList = document.getElementById('alert-list');
+            let alertsHtml = '';
+
+            if (pendingRequests > 0) {
+                alertsHtml += `<li class="text-red-600 font-medium flex items-start"><i data-lucide="alert-triangle" class="w-5 h-5 mr-3 mt-1 flex-shrink-0"></i> **${pendingRequests} New Adoption Requests** pending review.</li>`;
+            }
+
+            if (MOCK_USERS.filter(u => u.status === 'Deactivated' || u.status === 'Banned').length > 0) {
+                alertsHtml += `<li class="text-red-600 font-medium flex items-start"><i data-lucide="user-x" class="w-5 h-5 mr-3 mt-1 flex-shrink-0"></i> Accounts have status issues (Deactivated/Banned). Review required.</li>`;
+            }
+            
+            if (alertsHtml === '') {
+                alertsHtml = `<li class="text-green-600 font-medium flex items-start"><i data-lucide="check-circle" class="w-5 h-5 mr-3 mt-1 flex-shrink-0"></i> System status is nominal. No critical alerts.</li>`;
+            }
+            
+            // Add Recent Status Updates
+            alertsHtml += `<li class="pt-4 border-t border-gray-200 mt-4 text-gray-700">**Recently Processed:**`;
+            approvedRecent.forEach(a => {
+                alertsHtml += `<span class="ml-2 inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-0.5 rounded-full">${a.petName} Approved</span>`;
+            });
+            rejectedRecent.forEach(a => {
+                alertsHtml += `<span class="ml-2 inline-block bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded-full">${a.petName} Rejected</span>`;
+            });
+            alertsHtml += `</li>`;
+
+
+            alertList.innerHTML = alertsHtml;
+            lucide.createIcons();
+        }
+
+        /**
+         * Renders the Pet Management list.
+         */
+        function renderPetList() {
+            const petList = document.getElementById('pet-list');
+            const allStatuses = ['Available', 'Adopted', 'Unavailable'];
+
+            petList.innerHTML = MOCK_PETS.map(pet => {
+                let statusClass = {
+                    'Available': 'bg-green-100 text-green-800 border-green-500',
+                    'Adopted': 'bg-blue-100 text-blue-800 border-blue-500',
+                    'Unavailable': 'bg-red-100 text-red-800 border-red-500'
+                }[pet.status] || 'bg-gray-100 text-gray-800 border-gray-500';
+                
+                let opacityClass = pet.status === 'Adopted' ? 'opacity-70' : '';
+
+                // Filter out the current status for the dropdown options
+                const availableOptions = allStatuses
+                    .filter(status => status !== pet.status)
+                    .map(status => `<option value="${status}">Set ${status}</option>`)
+                    .join('');
+
+
+                return `
+                    <div class="card bg-white p-4 rounded-xl shadow-md border-l-4 border-amber-500 flex flex-col sm:flex-row sm:items-center gap-2 ${opacityClass}">
+                        <!-- CONDITIONAL PHOTO DISPLAY -->
+                        <div class="w-10 h-10 mr-4 flex-shrink-0">
+                            ${pet.photo ? 
+                                `<img src="${pet.photo}" alt="${pet.name}" class="w-full h-full object-cover rounded-full border-2 border-amber-300"/>` :
+                                `<i data-lucide="paw-print" class="w-full h-full text-amber-500"></i>`
+                            }
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-lg font-bold text-gray-900">${pet.name} (${pet.species}, ${pet.age} yrs)</div>
+                            <span class="inline-block text-sm font-medium px-3 py-0.5 rounded-full border ${statusClass}">${pet.status}</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mt-3 sm:mt-0">
+                            <button onclick="showEditPetModal(${pet.id})" class="text-amber-600 p-2 rounded-full hover:bg-amber-50 transition duration-150" title="Edit Details">
+                                <i data-lucide="square-pen" class="w-5 h-5"></i>
+                            </button>
+                            <!-- New Health Record Button -->
+                            <button onclick="showLogHealthRecordModal(${pet.id})" class="text-blue-600 p-2 rounded-full hover:bg-blue-50 transition duration-150" title="Log Health Record">
+                                <i data-lucide="file-medical" class="w-5 h-5"></i>
+                            </button>
+                            <!-- Reverting to only show statuses that are NOT the current status -->
+                            <select onchange="updatePetStatus(${pet.id}, this.value)" class="p-2 border border-gray-300 rounded-lg text-sm h-10 focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
+                                <option value="" disabled selected>Change Status</option>
+                                ${availableOptions}
+                            </select>
+                            <button onclick="deletePet(${pet.id})" class="text-red-600 p-2 rounded-full hover:bg-red-50 transition duration-150" title="Archive/Delete">
+                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            if (MOCK_PETS.length === 0) {
+                petList.innerHTML = '<p class="text-gray-600 italic">No pets currently registered in the system.</p>';
+            }
+            lucide.createIcons();
+        }
+
+        /**
+         * Renders the Adoption Application Management list.
+         */
+        function renderAdoptionRequests() {
+            const adoptionRequestsDiv = document.getElementById('adoption-requests');
+            const pendingRequests = MOCK_ADOPTIONS.filter(a => a.status === 'Pending');
+            const reviewedRequests = MOCK_ADOPTIONS.filter(a => a.status !== 'Pending');
+
+            let requestsHtml = '';
+
+            if (pendingRequests.length > 0) {
+                requestsHtml += `<h3 class="text-lg font-semibold text-red-700">Pending Requests (${pendingRequests.length})</h3>`;
+                requestsHtml += pendingRequests.map(app => generateAdoptionCard(app, 'pending')).join('');
+            } else {
+                requestsHtml += '<p class="text-gray-600 italic mb-4">No pending adoption requests at this time.</p>';
+            }
+
+            requestsHtml += `<h3 class="text-lg font-semibold text-gray-700 mt-6 pt-4 border-t border-gray-200">Reviewed Applications (${reviewedRequests.length})</h3>`;
+            requestsHtml += reviewedRequests.map(app => generateAdoptionCard(app, 'reviewed')).join('');
+
+            adoptionRequestsDiv.innerHTML = requestsHtml;
+            lucide.createIcons();
+        }
+        
+        /**
+         * Generates the HTML card for an adoption application.
+         */
+        function generateAdoptionCard(app, type) {
+            let statusClasses;
+            switch(app.status) {
+                case 'Pending':
+                    statusClasses = 'border-yellow-400 bg-yellow-50';
+                    break;
+                case 'Approved':
+                    statusClasses = 'border-green-500 bg-green-50';
+                    break;
+                case 'Rejected':
+                    statusClasses = 'border-red-500 bg-red-50';
+                    break;
+                case 'Need More Info':
+                    statusClasses = 'border-blue-400 bg-blue-50';
+                    break;
+                default:
+                    statusClasses = 'border-gray-400 bg-gray-50';
+            }
+            
+            const actionButtons = type === 'pending' ? `
+                <div class="flex gap-3 mt-4">
+                    <button onclick="updateAdoptionStatus(${app.id}, 'Approved')" class="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition duration-150">Approve</button>
+                    <button onclick="updateAdoptionStatus(${app.id}, 'Rejected')" class="px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition duration-150">Reject</button>
+                    <button onclick="updateAdoptionStatus(${app.id}, 'Need More Info')" class="px-4 py-2 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition duration-150">More Info</button>
+                </div>
+            ` : `
+                <span class="inline-block text-sm font-medium px-3 py-0.5 rounded-full border border-current text-gray-800 ${app.status === 'Approved' ? 'bg-green-100 text-green-800' : app.status === 'Rejected' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}">${app.status}</span>
+            `;
+
+            return `
+                <div class="card bg-white p-5 rounded-xl shadow-md border-l-4 ${statusClasses}">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-lg font-bold text-gray-900">Application #${app.id} for ${app.petName}</span>
+                        <span class="text-sm text-gray-600">Applicant: ${app.userName}</span>
+                    </div>
+                    <p class="text-gray-700 text-sm italic mb-2">Adopter Summary: ${app.answers}</p>
+                    ${actionButtons}
+                </div>
+            `;
+        }
+
+        /**
+         * Renders the Health Records section.
+         */
+        function renderHealthRecords() {
+            const select = document.getElementById('health-pet-select');
+            const viewButton = document.getElementById('view-records-btn');
+            
+            // Clear existing options
+            select.innerHTML = '<option value="" disabled selected>Select Pet to Manage Records</option>';
+            
+            MOCK_PETS.forEach(pet => {
+                const option = document.createElement('option');
+                option.value = pet.id;
+                option.textContent = `${pet.name} (${pet.species}, Status: ${pet.status})`;
+                select.appendChild(option);
+            });
+            
+            // Enable/disable view button based on selection
+            select.onchange = function() {
+                viewButton.disabled = !this.value;
+                document.getElementById('health-records-display').innerHTML = '<p class="text-gray-600 italic">Pet selected. Click "View Records" or use the Pet Management section to quickly log a record.</p>';
+            };
+
+            // Set placeholder message if no pets exist
+            if (MOCK_PETS.length === 0) {
+                 select.innerHTML = '<option value="" disabled selected>No pets available to manage.</option>';
+                 viewButton.disabled = true;
+            }
+
+            // Ensure the display area is cleared
+            document.getElementById('health-records-display').innerHTML = '<p class="text-gray-600 italic">Please select a pet from the list above to view their medical history or log a new record.</p>';
+            
+            // Re-create icons if the section is loaded
+            lucide.createIcons();
+        }
+
+        /**
+         * Mock function to view pet records and display a log button.
+         */
+        function viewPetHealthRecords() {
+            const petId = parseInt(document.getElementById('health-pet-select').value);
+            const pet = MOCK_PETS.find(p => p.id === petId);
+            const display = document.getElementById('health-records-display');
+
+            if (pet) {
+                 const content = `
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">${pet.name}'s Health History (ID: ${petId})</h3>
+                        <p class="text-gray-700 italic border-b pb-4">This section would list vaccination dates, treatments, and vet notes.</p>
+                        
+                        <!-- Log Button -->
+                        <button onclick="showLogHealthRecordModal(${petId})" class="px-4 py-2 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition duration-150">
+                            <i data-lucide="syringe" class="mr-2 inline h-5 w-5"></i> Log New Record
                         </button>
                     </div>
-                    <div class="action-buttons flex gap-3">
-                        <!-- LINKED TO FIND PETS PAGE (View All Pets Button) -->
-                        <button class="browse-all bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition" onclick="navigate('find-pets-page'); applyFilters();">View All Pets</button>
-                        <!-- UPDATED: Navigate to adopt-page instead of generic button -->
-                        <button class="start-app bg-gray-800 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-700 transition" onclick="navigate('adopt-page')">Start Application</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                 `;
+                display.innerHTML = content;
+                lucide.createIcons();
+            }
+        }
+        
+        /**
+         * Mock function for showing the log health record modal (using displayMessage).
+         */
+        function showLogHealthRecordModal(petId) {
+            const pet = MOCK_PETS.find(p => p.id === petId);
+            if (!pet) return;
 
-        <!-- 3. Trust/Validation Section (Skipped for brevity, assume content is stable) -->
-        <div class="trust-section text-center py-10 bg-gray-50">
-            <p class="text-gray-600 mb-8"><b>Trusted by leading animal welfare organizations</b></p>
-            <div class="badges flex justify-center gap-12 md:gap-20 flex-wrap">
-                <div class="badge-item w-24">
-                    <div class="icon">🐾</div>
-                    <p class="text-sm font-medium">ASPCA Certified</p>
-                </div>
-                <div class="badge-item w-24">
-                    <div class="icon">🩺</div>
-                    <p class="text-sm font-medium">Veterinary Approved</p>
-                </div>
-                <div class="badge-item w-24">
-                    <div class="icon">⭐</div>
-                    <p class="text-sm font-medium">5-Star Rated</p>
-                </div>
-                <div class="badge-item w-24">
-                    <div class="icon">✅</div>
-                    <p class="text-sm font-medium">98% Success Rate</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. Featured Pets Section (Uses dynamic rendering like the Find Pets page now) -->
-        <div class="featured-pets text-center py-16 px-4">
-            <h2 class="text-3xl font-bold mb-3">Meet Your New Best Friend</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto mb-12">Discover amazing pets waiting for their forever homes. Every pet comes with a complete health record and personality profile.</p>
-
-            <div class="pet-cards-container flex justify-center gap-6 flex-wrap">
-                <!-- Using only the first three pets for the featured section -->
-                <script>
-                    document.addEventListener('DOMContentLoaded', () => {
-                        const featuredContainer = document.querySelector('.featured-pets .pet-cards-container');
-                        if (featuredContainer) {
-                            // Render only the first 3 pets for featured section
-                            featuredContainer.innerHTML = PETS_DATA.slice(0, 4).map(createPetCardHTML).join('');
-                        }
-                    });
-                </script>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- ABOUT PAGE -->
-    <!-- ============================================== -->
-    <section id="about-page" data-page class="py-16 px-4">
-        <div class="max-w-4xl mx-auto text-center">
-            <h1 class="text-4xl font-extrabold mb-3 rounded-lg" style="color: var(--secondary-color);">About God's Home of Refuge</h1>
-            <p class="text-lg text-gray-600 mb-12">We are dedicated to creating lasting bonds between pets and families through compassionate care and innovative technology.</p>
-
-            <!-- Mission Statement and Image - Image is now on the right for large screens -->
-            <div class="about-mission items-center mb-16 flex flex-col lg:flex-row bg-white p-6 shadow-xl rounded-xl">
-                
-                <!-- START: Text content is now on the left -->
-                <div class="text-content text-left w-full lg:w-1/2 mb-6 lg:mb-0">
-                    <h2 class="text-3xl font-bold mb-4" style="color: var(--secondary-color);">Our Mission</h2>
-                    <p class="mb-4 text-gray-700">Founded in 2020, God's Home of Refuge revolutionized pet adoption by integrating advanced matching algorithms with comprehensive veterinary care. We believe every pet deserves a loving home, and every family deserves the perfect companion.</p>
-                    <p class="mb-4 text-gray-700">Our platform connects animal shelters and loving families to ensure the best outcomes for all pets in our care.</p>
-                    
-                    <!-- Added content based on the visual reference -->
-                    <div class="flex items-center text-left mt-6 p-3 rounded-lg border-l-4 border-l-orange-400 bg-orange-50/50">
-                        <span class="text-xl mr-3" style="color: var(--secondary-color);">✨</span>
-                        <div>
-                            <p class="font-bold text-lg text-gray-800">Over 1,000 successful adoptions</p>
-                            <p class="text-sm text-gray-500">Since our founding</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- END: Text content on left -->
-
-                <!-- START: Image moved to the right and given responsive margins/widths -->
-                <img src="people.jpg" 
-                     alt="Veterinarian smiling while examining a happy dog" 
-                     class="w-full lg:w-1/2 rounded-lg object-cover shadow-md lg:ml-8">
-                <!-- END: Image is on the right -->
-            </div>
-            
-            <!-- Adding a section for the cards based on the image -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
-                
-                <!-- Card 1: Health Screening (Hover added) -->
-                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-t-orange-400 transform transition duration-300 hover:scale-[1.03] hover:shadow-xl cursor-pointer">
-                    <span class="text-4xl block mb-4" style="color: var(--secondary-color);">🩺</span>
-                    <h3 class="text-xl font-bold mb-2">Comprehensive Health Screening</h3>
-                    <p class="text-gray-600 text-sm">Every pet receives thorough health examinations and vaccinations before adoption.</p>
-                </div>
-                
-                <!-- Card 2: Perfect Matching (Hover added) -->
-                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-t-orange-400 transform transition duration-300 hover:scale-[1.03] hover:shadow-xl cursor-pointer">
-                    <span class="text-4xl block mb-4" style="color: var(--secondary-color);">💖</span>
-                    <h3 class="text-xl font-bold mb-2">Perfect Matching</h3>
-                    <p class="text-gray-600 text-sm">Our AI-powered system matches pets with families based on lifestyle and preferences.</p>
-                </div>
-                
-                <!-- Card 3: Lifetime Support (Hover added) -->
-                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-t-orange-400 transform transition duration-300 hover:scale-[1.03] hover:shadow-xl cursor-pointer">
-                    <span class="text-4xl block mb-4" style="color: var(--secondary-color);">🐾</span>
-                    <h3 class="text-xl font-bold mb-2">Lifetime Support</h3>
-                    <p class="text-gray-600 text-sm">We provide ongoing support and resources throughout your pet's life.</p>
-                </div>
-            </div>
-
-        </div>
-    </section>
-    
-    <!-- ============================================== -->
-    <!-- FIND PETS PAGE -->
-    <!-- ============================================== -->
-    <section id="find-pets-page" data-page class="py-16 px-4 hidden">
-        <div class="max-w-6xl mx-auto">
-            <h1 class="text-4xl font-extrabold text-center mb-2" style="color: var(--secondary-color);">Find Your Perfect Pet</h1>
-            <p class="text-lg text-gray-600 text-center mb-8">View our currently available pets and find your new best friend.</p>
-
-            <!-- Filter Bar -->
-            <div class="filter-bar flex flex-col md:flex-row gap-4 justify-center md:justify-between items-center mb-10 mx-auto max-w-4xl">
-                <select id="filter-type" class="p-3 rounded-lg w-full md:w-auto" style="color: var(--secondary-color);">
-                    <option value="All Types">All Types</option>
-                    <option value="Dog">Dog</option>
-                    <option value="Cat">Cat</option>
-                    <option value="Other">Other</option>
-                </select>
-                <select id="filter-age" class="p-3 rounded-lg w-full md:w-auto" style="color: var(--secondary-color);">
-                    <option value="All Ages">All Ages</option>
-                    <option value="Puppy/Kitten">Puppy/Kitten</option>
-                    <option value="Adult">Adult</option>
-                    <option value="Senior">Senior</option>
-                </select>
-                <select id="filter-size" class="p-3 rounded-lg w-full md:w-auto" style="color: var(--secondary-color);">
-                    <option value="All Sizes">All Sizes</option>
-                    <option value="Small">Small</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Large">Large</option>
-                </select>
-                <button id="apply-filters-btn" class="text-white px-8 py-3 rounded-lg font-semibold w-full md:w-auto transition hover:bg-amber-600" style="background-color: var(--primary-color);">
-                    Apply Filters
-                </button>
-            </div>
-
-            <!-- Pet Cards Grid - Content is generated by JS (applyFilters on load) -->
-            <div id="find-pets-grid" class="pet-cards-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Pet Cards will be injected here by JavaScript -->
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- PET DETAIL PAGE (New Page) -->
-    <!-- ============================================== -->
-    <section id="pet-detail-page" data-page class="py-16 px-4 hidden">
-        <div class="max-w-5xl mx-auto">
-            <a href="#" class="text-gray-500 hover:text-gray-700 transition mb-6 inline-flex items-center" onclick="navigate('find-pets-page'); applyFilters(); return false;">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                Back to Pet Search
-            </a>
-
-            <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-                <div class="flex flex-col lg:flex-row gap-10">
-                    <!-- Image Column -->
-                    <div class="lg:w-1/2">
-                        <!-- Default placeholder for the image which will be replaced by renderPetDetails -->
-                        <img id="detail-img" src="https://placehold.co/500x350/cccccc/3b3a3c?text=Pet+Image" alt="Pet Profile" class="w-full h-auto object-cover rounded-lg shadow-md">
-                    </div>
-                    
-                    <!-- Details Column -->
-                    <div class="lg:w-1/2">
-                        <span class="inline-block bg-green-100 text-green-700 text-sm font-medium px-3 py-1 rounded-full mb-3">Available for Adoption</span>
-                        <h1 id="detail-name" class="text-4xl font-extrabold mb-1" style="color: var(--secondary-color);">Buddy</h1>
-                        <p id="detail-meta" class="text-lg text-gray-500 mb-6">Labrador Retriever • 4 years old • Male</p>
-
-                        <p id="detail-description" class="text-gray-700 mb-8 leading-relaxed">
-                            Buddy is a loyal and gentle companion who loves outdoor activities and is great with kids. He is well-trained and socialized, making him a perfect family pet. Buddy enjoys long walks, playing fetch, and spending quality time with his companions.
-                        </p>
-
-                        <!-- Key Stats Grid -->
-                        <div class="grid grid-cols-2 gap-4 mb-10">
-                            <div class="detail-info-box">
-                                <h4 class="text-xs font-semibold uppercase text-gray-500">Size</h4>
-                                <p id="detail-size-value" class="text-base font-medium text-gray-800">Large (65 lbs)</p>
-                            </div>
-                            <div class="detail-info-box">
-                                <h4 class="text-xs font-semibold uppercase text-gray-500">Energy Level</h4>
-                                <p id="detail-energy-value" class="text-base font-medium text-gray-800">High</p>
-                            </div>
-                            <div class="detail-info-box">
-                                <h4 class="text-xs font-semibold uppercase text-gray-500">Good With Kids</h4>
-                                <p id="detail-kids-value" class="text-base font-medium text-gray-800">Excellent</p>
-                            </div>
-                            <div class="detail-info-box">
-                                <h4 class="text-xs font-semibold uppercase text-gray-500">Training</h4>
-                                <p id="detail-training-value" class="text-base font-medium text-gray-800">House trained</p>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="detail-actions flex gap-4">
-                            <!-- UPDATED: Use startAdoptionProcess to navigate and pre-fill the form -->
-                            <button class="text-white shadow-lg flex-grow hover:bg-opacity-90" style="background-color: var(--primary-color);" onclick="startAdoptionProcess(document.getElementById('detail-name').textContent)">
-                                Adopt <span id="adopt-pet-name">Buddy</span>
-                            </button>
-                            <button class="border border-gray-400 text-gray-700 hover:bg-gray-100 flex-grow" onclick="alert('Contacting shelter for more information.')">
-                                Contact Shelter
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-       
-    <!-- ============================================== -->
-    <!-- ADOPTION APPLICATION PAGE (New Page) -->
-    <!-- ============================================== -->
-    <section id="adopt-page" data-page class="py-16 px-4 hidden">
-        <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-            <h1 class="text-4xl font-extrabold text-center mb-2" style="color: var(--secondary-color);">Adoption Application</h1>
-            <p class="text-lg text-gray-600 text-center mb-10">Help us find the perfect match by telling us about yourself and your preferences.</p>
-            
-            <form id="adoption-form" class="space-y-6">
-                <!-- Personal Info -->
-                <h2 class="text-2xl font-semibold border-b pb-2 mb-4" style="color: var(--primary-color);">Personal Information</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" id="app-first-name" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500" placeholder="First Name *" required>
-                    <input type="text" id="app-last-name" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500" placeholder="Last Name *" required>
-                    <input type="email" id="app-email" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500" placeholder="Email Address *" required>
-                    <input type="tel" id="app-phone" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500" placeholder="Phone Number *" required>
-                </div>
-                <input type="text" id="app-address" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 w-full" placeholder="Full Address *" required>
-                
-                <!-- Pet Details (Optional - to be pre-filled) -->
-                <h2 class="text-2xl font-semibold border-b pb-2 mb-4 mt-8" style="color: var(--primary-color);">Pet Preference</h2>
-                <p id="pet-name-message" class="text-sm text-gray-500 hidden">You are applying for: <span class="font-bold" id="pre-filled-pet-name"></span></p>
-                <input type="text" id="app-pet-name" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 w-full" placeholder="Name of Pet You're Interested In (Optional)">
-
-                <!-- Experience Level -->
+            // HTML content for the form inside the modal body
+            const formHtml = `
+                <p class="text-gray-700 mb-4">Logging a new medical record for **${pet.name}**.</p>
                 <div class="space-y-3">
-                    <label class="block font-medium text-gray-700">Experience Level *</label>
-                    <div class="flex flex-wrap gap-6">
-                        <label class="inline-flex items-center"><input type="radio" name="experience" value="First-time owner" class="form-radio text-amber-500 h-4 w-4" required><span class="ml-2">First-time owner</span></label>
-                        <label class="inline-flex items-center"><input type="radio" name="experience" value="Some experience" class="form-radio text-amber-500 h-4 w-4"><span class="ml-2">Some experience</span></label>
-                        <label class="inline-flex items-center"><input type="radio" name="experience" value="Very experienced" class="form-radio text-amber-500 h-4 w-4"><span class="ml-2">Very experienced</span></label>
-                    </div>
+                    <input type="text" id="record-type" placeholder="Record Type (e.g., Vaccination, Check-up, Deworming)" class="input-field p-3 border border-gray-300 rounded-lg w-full">
+                    <textarea id="record-details" placeholder="Details/Notes (e.g., Canine Distemper Vaccine given, Weight 3.2kg)" rows="3" class="input-field p-3 border border-gray-300 rounded-lg w-full"></textarea>
                 </div>
+                <button onclick="logRecord(${petId}, document.getElementById('record-type').value, document.getElementById('record-details').value)" class="btn-primary bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg font-bold shadow-md transition duration-150 w-full mt-4">
+                    Submit Record
+                </button>
+                <div class="pt-4">
+                    <button onclick="document.getElementById('message-modal').classList.add('hidden')" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 p-3 rounded-lg font-bold transition duration-150">Cancel</button>
+                </div>
+            `;
+            
+            // Display the custom form modal
+            displayMessage(
+                `Log Medical Record for ${pet.name}`,
+                formHtml,
+                "text-blue-600"
+            );
+            
+            // Since displayMessage automatically adds a close button, we replace it with our form submit/cancel buttons
+            // I'll ensure the existing close button is hidden or removed in favor of the custom buttons I added in formHtml
+            // However, to satisfy the displayMessage contract, I will simply ensure the custom buttons are visible and functional.
+            // The default close button outside the form is still present for quick dismissal if needed.
+        }
+        
+        /**
+         * Mock function to simulate logging the record.
+         */
+        function logRecord(petId, type, details) {
+            const pet = MOCK_PETS.find(p => p.id === petId);
+            document.getElementById('message-modal').classList.add('hidden');
 
-                <!-- Living Situation -->
-                <div class="space-y-3">
-                    <label class="block font-medium text-gray-700">Living Situation *</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <label class="inline-flex items-center"><input type="checkbox" name="situation" value="yard" class="form-checkbox rounded text-amber-500 h-4 w-4"><span class="ml-2">I have a yard</span></label>
-                        <label class="inline-flex items-center"><input type="checkbox" name="situation" value="other-pets" class="form-checkbox rounded text-amber-500 h-4 w-4"><span class="ml-2">I have other pets</span></label>
-                        <label class="inline-flex items-center"><input type="checkbox" name="situation" value="children" class="form-checkbox rounded text-amber-500 h-4 w-4"><span class="ml-2">I have children in the home</span></label>
-                        <label class="inline-flex items-center"><input type="checkbox" name="situation" value="rent" class="form-checkbox rounded text-amber-500 h-4 w-4"><span class="ml-2">I rent my home</span></label>
-                    </div>
-                </div>
+            if (!type.trim() || !details.trim()) {
+                 displayMessage(
+                    "Error", 
+                    "Record Type and Details cannot be empty. Please ensure all fields are filled.", 
+                    "text-red-600"
+                );
+                 return;
+            }
+
+            console.log(`[API MOCK] Logged health record for ${pet.name}: Type: ${type}, Details: ${details}`);
+            displayMessage(
+                "Record Saved Successfully",
+                `<p>A new record (${type}) has been logged for ${pet.name}.</p><p class="mt-2 text-sm italic">Details: ${details.substring(0, 50)}...</p>`,
+                "text-green-600"
+            );
+        }
+
+        /**
+         * Renders the User Management list.
+         */
+        function renderUserList() {
+            const userList = document.getElementById('user-list');
+            MOCK_USERS.sort((a, b) => {
+                if (a.status === 'Banned' && b.status !== 'Banned') return -1;
+                if (a.status !== 'Banned' && b.status === 'Banned') return 1;
+                return 0;
+            });
+
+            userList.innerHTML = MOCK_USERS.map(user => {
+                let statusClasses;
+                let toggleIcon;
+                let toggleTitle;
                 
-                <!-- Essay/Motivation -->
-                <div>
-                    <label for="app-motivation" class="block font-medium text-gray-700 mb-2">Tell us why you want to adopt a pet *</label>
-                    <textarea id="app-motivation" rows="4" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 w-full" placeholder="Share your motivation and what you are looking for in a companion pet..." required></textarea>
-                    <p class="text-xs text-gray-500 text-right">Max 500 characters</p>
-                </div>
-
-                <button type="submit" class="w-full py-3 rounded-lg font-semibold text-white shadow-lg transition hover:bg-amber-700" style="background-color: var(--primary-color);">
-                    Submit Application
-                </button>
-            </form>
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- HEALTH RECORDS PAGE (Section with Filters) -->
-    <!-- ============================================== -->
-    <section id="health-page" data-page class="py-16 px-4 hidden">
-        <div class="max-w-6xl mx-auto">
-            <h1 class="text-4xl font-extrabold text-center mb-2" style="color: var(--secondary-color);">Health Records</h1>
-            <p class="text-lg text-gray-600 text-center mb-10">Access the full health history for all pets available for adoption.</p>
-
-            <!-- Health Filter Bar (New Feature) -->
-            <div class="filter-bar flex flex-col md:flex-row gap-4 justify-center items-center mb-10 mx-auto max-w-4xl">
-                <select id="health-filter-type" class="p-3 rounded-lg w-full md:w-auto" style="color: var(--secondary-color);">
-                    <option value="All Types">All Types</option>
-                    <option value="Dog">Dog</option>
-                    <option value="Cat">Cat</option>
-                    <option value="Other">Other</option>
-                </select>
-                <select id="health-filter-vaccine" class="p-3 rounded-lg w-full md:w-auto" style="color: var(--secondary-color);">
-                    <option value="All Status">All Vaccine Statuses</option>
-                    <option value="Up to Date">Up to Date</option>
-                    <option value="Attention Needed">Attention Needed</option>
-                    <option value="N/A">Not Applicable (N/A)</option>
-                </select>
-                <button id="apply-health-filters-btn" class="text-white px-8 py-3 rounded-lg font-semibold w-full md:w-auto transition hover:bg-amber-600" style="background-color: var(--primary-color);">
-                    Apply Filters
-                </button>
-            </div>
-            
-            <!-- Health Record Cards Grid - Content is generated by JS (applyHealthFilters on load) -->
-            <div id="health-records-grid" class="health-cards-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Health Cards will be injected here by JavaScript -->
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- HEALTH DETAIL PAGE (New Section) -->
-    <!-- ============================================== -->
-    <section id="health-detail-page" data-page class="py-16 px-4 hidden bg-gray-50 min-h-screen">
-        <div class="max-w-4xl mx-auto">
-             <a href="#" class="text-gray-500 hover:text-gray-700 transition mb-6 inline-flex items-center" onclick="navigate('health-page'); applyHealthFilters(); return false;">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                Back to Health Records
-            </a>
-            
-            <!-- Header Card -->
-            <div class="bg-white p-6 rounded-xl shadow-lg mb-8 flex flex-col md:flex-row items-center gap-6 border-t-4" style="border-top-color: var(--primary-color);">
-                <img id="health-detail-pet-img" src="https://placehold.co/100x100/e09e50/ffffff?text=Pet" alt="Pet Profile" class="w-24 h-24 object-cover rounded-full shadow-md">
-                <div>
-                    <h1 id="health-detail-pet-name" class="text-3xl font-extrabold" style="color: var(--secondary-color);">Buddy</h1>
-                    <p id="health-detail-pet-meta" class="text-md text-gray-500">Labrador Retriever • 4 years old • Male</p>
-                </div>
-            </div>
-
-            <!-- Summary -->
-            <h2 class="text-2xl font-bold mb-4 border-b pb-2" style="color: var(--primary-color);">Health Summary</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div class="p-3 bg-white rounded-lg shadow-sm text-center">
-                    <p class="text-xs uppercase font-semibold text-gray-500">Vaccination</p>
-                    <p id="summary-vaccines" class="font-bold text-lg text-green-600">Up to Date</p>
-                </div>
-                <div class="p-3 bg-white rounded-lg shadow-sm text-center">
-                    <p class="text-xs uppercase font-semibold text-gray-500">Last Checkup</p>
-                    <p id="summary-checkup" class="font-bold text-lg text-gray-700">March 15, 2024</p>
-                </div>
-                <div class="p-3 bg-white rounded-lg shadow-sm text-center">
-                    <p class="text-xs uppercase font-semibold text-gray-500">Weight</p>
-                    <p id="summary-weight" class="font-bold text-lg text-gray-700">65 lbs</p>
-                </div>
-                <div class="p-3 bg-white rounded-lg shadow-sm text-center">
-                    <p class="text-xs uppercase font-semibold text-gray-500">Medication</p>
-                    <p id="summary-meds" class="font-bold text-lg text-gray-700">None Active</p>
-                </div>
-            </div>
-
-            <!-- Full Records List -->
-            <h2 class="text-2xl font-bold mb-4 border-b pb-2" style="color: var(--primary-color);">Complete Veterinary History</h2>
-            <div id="health-records-list" class="space-y-4">
-                <!-- Detailed records will be injected here by renderHealthDetails() -->
-            </div>
-            
-            <div class="text-center mt-10">
-                <button class="text-white px-8 py-3 rounded-lg font-semibold shadow-md transition hover:bg-amber-600" style="background-color: var(--primary-color);" onclick="alert('Printing complete pet Health Record.')">
-                    Print Full History
-                </button>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- CONTACT PAGE (NEW SECTION) -->
-    <!-- ============================================== -->
-    <section id="contact-page" data-page class="py-16 px-4 hidden">
-        <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-            <h1 class="text-4xl font-extrabold text-center mb-2" style="color: var(--secondary-color);">Get In Touch</h1>
-            <p class="text-lg text-gray-600 text-center mb-10">We'd love to hear from you. Please fill out the form below or use our direct contact info.</p>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-                <!-- Contact Info Panel -->
-                <div class="p-6 rounded-lg bg-gray-50 border border-gray-200">
-                    <h3 class="text-xl font-bold mb-4" style="color: var(--primary-color);">Our Details</h3>
-                    <div class="space-y-4 text-gray-700">
-                        <p class="flex items-center">
-                            <!-- Email Icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                            godshomeofrefuge@yahoo.com
-                        </p>
-                        <p class="flex items-center">
-                            <!-- Phone Icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                            09266642935
-                        </p>
-                        <p class="flex items-start">
-                            <!-- Location Icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-amber-500 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                            Diokno Highway, Lemery, Batangas
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Simple Map Placeholder (since external maps/images are disallowed) -->
-                <div class="h-48 md:h-full w-full bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 font-medium border-4 border-gray-300 border-dashed">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3060.2485093277055!2d120.88421997382885!3d13.961855892398132!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bda1fb68ed29fd%3A0x2c45bab6feba7c9!2sHouse%20of%20Namjoon%20(GHOR%20Shelter)!5e1!3m2!1sen!2sph!4v1762866963287!5m2!1sen!2sph" 
-                    width="600" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                </div>
-            </div>
-
-            <h2 class="text-2xl font-semibold border-b pb-2 mb-6" style="color: var(--primary-color);">Send Us A Message</h2>
-            <form id="contact-form" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" id="contact-name" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500" placeholder="Your Name *" required>
-                    <input type="email" id="contact-email" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500" placeholder="Your Email *" required>
-                </div>
-                <input type="text" id="contact-subject" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 w-full" placeholder="Subject (e.g., Volunteer Inquiry, Pet Question) *" required>
+                switch(user.status) {
+                    case 'Active':
+                        statusClasses = 'text-green-600';
+                        toggleIcon = 'toggle-left';
+                        toggleTitle = 'Deactivate User';
+                        break;
+                    case 'Deactivated':
+                        statusClasses = 'text-yellow-600';
+                        toggleIcon = 'toggle-right';
+                        toggleTitle = 'Activate User';
+                        break;
+                    case 'Banned':
+                        statusClasses = 'text-red-600';
+                        toggleIcon = 'slash';
+                        toggleTitle = 'User is Banned (Click to Unban)';
+                        break;
+                    default:
+                        statusClasses = 'text-gray-600';
+                        toggleIcon = 'circle-slash';
+                        toggleTitle = 'Unknown Status';
+                }
                 
-                <textarea id="contact-message" rows="5" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 w-full" placeholder="Your Message *" required></textarea>
+                let roleClasses = user.role === 'Admin' 
+                    ? 'bg-amber-100 text-amber-800' 
+                    : 'bg-gray-100 text-gray-800';
 
-                <button type="submit" class="w-full py-3 rounded-lg font-semibold text-white shadow-lg transition hover:bg-amber-700" style="background-color: var(--primary-color);">
-                    Send Message
-                </button>
-            </form>
-        </div>
-    </section>
+                // Button base style
+                const btnBaseClasses = "p-2 rounded-full transition duration-150";
 
+                // Ban/Unban Button Logic
+                const banButtonHtml = user.status === 'Banned' ? 
+                    `<button onclick="banUser('${user.id}')" class="${btnBaseClasses} text-green-600 hover:bg-green-50" title="Unban User">
+                        <i data-lucide="unlock" class="w-5 h-5"></i>
+                    </button>` :
+                    `<button onclick="banUser('${user.id}')" class="${btnBaseClasses} text-red-600 hover:bg-red-50" title="Ban User">
+                        <i data-lucide="lock" class="w-5 h-5"></i>
+                    </button>`;
 
-    <!-- 5. Footer (Always visible) -->
-    <footer class="mt-12 text-white" style="background-color: var(--secondary-color);">
-        <div class="footer-content max-w-6xl mx-auto py-12 px-6 grid grid-cols-1 md:grid-cols-4 gap-10">
-            <div class="footer-logo">
-                <h3 class="text-xl font-extrabold mb-3">God's<span style="color: var(--primary-color);"> Home of Refuge</span></h3>
-                <p class="text-sm text-gray-300 mb-4">Connecting loving families with pets in need of a forever home.</p>
-                <div class="social-links flex space-x-3">
-                    <!-- Icons for Facebook, Twitter, Instagram -->
+                // Activate/Deactivate Toggle
+                const toggleButtonHtml = user.status !== 'Banned' ?
+                    `<button onclick="toggleUserStatus('${user.id}')" class="${btnBaseClasses} text-gray-600 hover:bg-gray-100" title="${toggleTitle}">
+                        <i data-lucide="${toggleIcon}" class="w-5 h-5"></i>
+                    </button>` :
+                    `<button disabled class="${btnBaseClasses} text-gray-300 cursor-not-allowed" title="Toggle unavailable for Banned status">
+                        <i data-lucide="power" class="w-5 h-5"></i>
+                    </button>`;
 
-                    <a href="https://www.facebook.com/share/1CxtiGGBsx/" class="text-gray-400 hover:text-white transition" aria label="visit our facebook page"></i>facebook</a>
-                </div>
-            </div>
+                return `
+                    <div class="card bg-white p-4 rounded-xl shadow-md flex items-center border-l-4 border-gray-200">
+                        <i data-lucide="user" class="w-6 h-6 mr-4 text-gray-500"></i>
+                        <div class="flex-1">
+                            <div class="text-lg font-semibold text-gray-900">${user.name}</div>
+                            <span class="text-xs font-medium px-2 py-0.5 rounded-full ${roleClasses}">${user.role}</span>
+                            <span class="text-xs ml-2 font-semibold ${statusClasses}">${user.status}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="resetUserPassword('${user.id}')" class="${btnBaseClasses} text-blue-600 hover:bg-blue-50" title="Reset Password">
+                                <i data-lucide="key-round" class="w-5 h-5"></i>
+                            </button>
+                            ${toggleButtonHtml}
+                            ${banButtonHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
 
-            <div class="footer-links">
-                <h4 class="font-bold mb-4" style="color: var(--primary-color);">Quick Links</h4>
-                <ul class="space-y-2 text-sm text-gray-300">
-                    <li><a href="#" onclick="navigate('home-page')">Home</a></li>
-                    <li><a href="#" onclick="navigate('about-page')">About Us</a></li>
-                    <li><a href="#" onclick="navigate('find-pets-page'); applyFilters();">Find Pets</a></li>
-                    <li><a href="#" onclick="navigate('adopt-page')">Adoption Process</a></li>
-                    <li><a href="#" onclick="navigate('health-page')">Health Records</a></li>
-                </ul>
-            </div>
-            <div class="footer-links">
-                <h4 class="font-bold mb-4" style="color: var(--primary-color);">Support</h4>
-                <ul class="space-y-2 text-sm text-gray-300">
-                    <li><a href="#" onclick="navigate('contact-page')">Contact Us</a></li>
-                </ul>
-            </div>
-            <div class="contact-info">
-                <h4 class="font-bold mb-4" style="color: var(--primary-color);">Contact Information</h4>
-                <p class="text-sm mb-2">09266642935</p>
-                <p class="text-xs text-gray-400">  Diokno Highway, Lemery, Batangas </p>
-            </div>
-        </div>
-        <div class="text-center text-xs py-4 border-t border-gray-700 text-gray-400">
-            © 2025 God's Home of Refuge. All rights reserved. | Privacy Policy | Terms of Service
-        </div>
-    </footer>
+        // --- DATA MANIPULATION FUNCTIONS (Unchanged logic) ---
 
+        /**
+         * Adds a new pet to the mock database. (POST /api/pets)
+         */
+        document.getElementById('add-pet-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('pet-name').value.trim();
+            const species = document.getElementById('pet-species').value;
+            const age = parseInt(document.getElementById('pet-age').value);
+
+            if (!name || !species || isNaN(age)) return;
+
+            const newPet = {
+                id: nextPetId++,
+                name,
+                species,
+                age,
+                status: "Available",
+                photo: currentPetImage // ADDED photo field
+            };
+
+            MOCK_PETS.push(newPet);
+            
+            this.reset();
+            currentPetImage = null; // Reset image state
+            document.getElementById('photo-preview-container').classList.add('hidden'); // Hide preview
+            renderPetList();
+            renderDashboard(); 
+            displayMessage("Success", `Pet ${newPet.name} has been successfully registered!`, "text-green-600");
+            console.log(`Pet Added: ${newPet.name}`);
+        });
+
+        /**
+         * Updates a pet's availability status. (PUT /api/pets/{id})
+         */
+        function updatePetStatus(petId, newStatus) {
+            const pet = MOCK_PETS.find(p => p.id === petId);
+            if (pet) {
+                pet.status = newStatus;
+                renderPetList();
+                renderDashboard();
+                console.log(`Pet ${pet.name} status updated to ${newStatus}`);
+            }
+        }
+
+        /**
+         * Updates an adoption request's status and potentially the pet's status. (PUT /api/adoptions/{id})
+         */
+        function updateAdoptionStatus(appId, newStatus) {
+            const app = MOCK_ADOPTIONS.find(a => a.id === appId);
+            if (app) {
+                app.status = newStatus;
+                
+                if (newStatus === 'Approved') {
+                    const pet = MOCK_PETS.find(p => p.id === app.petId);
+                    if (pet) {
+                        pet.status = 'Adopted';
+                        console.log(`Pet ${pet.name} status automatically updated to Adopted.`);
+                    }
+                }
+
+                renderAdoptionRequests();
+                renderDashboard();
+                if (!document.getElementById('pet-management').classList.contains('hidden')) {
+                    renderPetList();
+                }
+                
+                console.log(`Application ${appId} status updated to ${newStatus}`);
+            }
+        }
+
+        /**
+         * Simulates resetting a user's password and notifies the admin via modal.
+         */
+        function resetUserPassword(userId) {
+            const user = MOCK_USERS.find(u => u.id === userId);
+            if (user) {
+                console.log(`[API MOCK] Initiating password reset for user: ${user.name} (${userId})`);
+                
+                displayMessage(
+                    "Password Reset Initiated",
+                    `<p>A secure password reset link has been successfully sent to the email address associated with **${user.name}**.</p>`,
+                    "text-blue-600"
+                );
+            }
+        }
+
+        /**
+         * Toggles a user's status between 'Active' and 'Deactivated'.
+         */
+        function toggleUserStatus(userId) {
+            const user = MOCK_USERS.find(u => u.id === userId);
+            if (user && user.status !== 'Banned') {
+                let newStatus = user.status === 'Active' ? 'Deactivated' : 'Active';
+                let message = newStatus === 'Deactivated' 
+                    ? `The account for **${user.name}** has been successfully **deactivated**.`
+                    : `The account for **${user.name}** has been successfully **activated** (if they were previously deactivated).`;
+                
+                user.status = newStatus;
+                renderUserList();
+                renderDashboard();
+                console.log(`[API MOCK] User ${user.name} status toggled to: ${newStatus}`);
+
+                displayMessage(
+                    `${newStatus} Confirmation`,
+                    `<p>${message}</p>`,
+                    newStatus === 'Active' ? 'text-green-600' : 'text-yellow-600'
+                );
+            }
+        }
+
+        /**
+         * Sets a user's status to 'Banned' or 'Active' if currently banned.
+         */
+        function banUser(userId) {
+            const user = MOCK_USERS.find(u => u.id === userId);
+            if (user) {
+                let newStatus;
+                let message;
+                let title;
+                let color;
+
+                if (user.status === 'Banned') {
+                    // Unban logic: revert to Active
+                    newStatus = 'Active';
+                    title = 'User Unbanned';
+                    message = `The ban on **${user.name}** has been lifted. The account is now **Active**.`;
+                    color = 'text-green-600';
+                } else {
+                    // Ban logic
+                    newStatus = 'Banned';
+                    title = 'User Banned';
+                    message = `The account for **${user.name}** (${userId}) has been successfully **banned** due to policy violation.`;
+                    color = 'text-red-600';
+                }
+
+                user.status = newStatus;
+                renderUserList();
+                renderDashboard();
+                console.log(`[API MOCK] User ${user.name} status set to: ${newStatus}`);
+
+                displayMessage(title, `<p>${message}</p>`, color);
+            }
+        }
+
+        /**
+         * Mock function for deleting a pet.
+         */
+        function deletePet(petId) {
+            const pet = MOCK_PETS.find(p => p.id === petId);
+            if (pet) {
+                 displayMessage(
+                    `Confirm Deletion`,
+                    `<p>Are you sure you want to permanently archive the pet record for **${pet.name}**? This action cannot be undone.</p>`,
+                    "text-red-600"
+                );
+                // For a real app, this modal would contain confirmation buttons.
+                MOCK_PETS = MOCK_PETS.filter(p => p.id !== petId);
+                renderPetList();
+                renderDashboard();
+                console.log(`Pet ${petId} archived/deleted.`);
+            }
+        }
+
+        /**
+         * Mock function for showing the edit pet modal.
+         */
+        function showEditPetModal(petId) {
+            console.log(`Opening modal to edit pet ID: ${petId}. (Not fully implemented in this demo)`);
+            displayMessage(
+                "Edit Pet Details",
+                `<p>Editing Pet ID ${petId}. This is a placeholder for a full form implementation.</p>`,
+                "text-amber-600"
+            );
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            showSection('dashboard');
+            lucide.createIcons();
+        };
+
+    </script>
 </body>
 </html>

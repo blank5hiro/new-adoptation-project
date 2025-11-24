@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     if (role === 'admin') {
                         // COMMENT: Admin account successfully logged in. 
-                        window.location.href = 'admin.html'; 
+                        window.open('admin2.html', '_blank');
                     } else if (role === 'user') {
                         // COMMENT: User account successfully logged in. 
                         window.location.href = 'user.html'; 
